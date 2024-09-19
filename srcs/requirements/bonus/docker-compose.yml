@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+
+  mariadb:
+    build: 
+      context: ./mariadb/
+    image: mariadb:1337
+    container_name: mariadb 
+    env_file:
+      - .env
+    volumes:
+      - db:/var/lib/mysql/
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 1000000
+    restart: always
+    networks:
+      - inception-net
+
+  nginx:
+    build: 
+      context: ./nginx/
+    image: nginx:1337
+    container_name: nginx 
+    env_file:
+      - .env
+    volumes:
+      - wordpress:/var/www/wordpress/
+    ports:
+      - 443:50
+    restart: always
+    networks:
+      - inception-net
+
+  wordpress:
+    build:
+      context: ./wordpress/
+    image: wordpress:1337
+    container_name: wordpress 
+    env_file:
+      - .env
+    volumes:
+      - wordpress:/var/www/wordpress/
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    restart: always
+    networks:
+      - inception-net
+
+  debian:
+    build:
+      context: ./debian/
+    image: debian:XD
+    container_name: mysql_client
+    env_file:
+      - .env
+    networks:
+      - inception-net
+  
+  adminer:
+    build:
+      context: ./adminer/
+    image: adminer:1337
+    container_name: adminer
+    env_file:
+      - .env
+    networks:
+      - inception-net
+      
+  redis:
+    build:
+      context: ./redis/
+    image: redis:1337
+    container_name: redis
+    env_file:
+      - .env
+    networks:
+      - inception-net
+
+  ftp:
+    build:
+      context: ./ftp/
+    image: ftp:1337
+    container_name: ftp
+    env_file:
+      - .env
+    ports:
+      - 25:21
+      - "30000-30100:30000-30100"
+    volumes:
+      - wordpress:/var/www/wordpress/
+    networks:
+      - inception-net
+
+networks:
+  inception-net:
+    driver: bridge
+
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/hbouabda/data/db/
+  
+  wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/hbouabda/data/wordpress/

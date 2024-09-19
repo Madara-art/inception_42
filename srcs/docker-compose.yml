@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+
+  mariadb:
+    build: 
+      context: ./requirements/mariadb/
+    image: mariadb:1337
+    container_name: mariadb 
+    env_file:
+      - .env
+    volumes:
+      - db:/var/lib/mysql/
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 1000000
+    restart: always
+    networks:
+      - inception-net
+
+  nginx:
+    build: 
+      context: ./requirements/nginx/
+    image: nginx:1337
+    container_name: nginx 
+    env_file:
+      - .env
+    volumes:
+      - wordpress:/var/www/wordpress/
+    ports:
+      - 443:50
+    restart: always
+    networks:
+      - inception-net
+
+  wordpress:
+    build:
+      context: ./requirements/wordpress/
+    image: wordpress:1337
+    container_name: wordpress 
+    env_file:
+      - .env
+    volumes:
+      - wordpress:/var/www/wordpress/
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    restart: always
+    networks:
+      - inception-net
+
+  debian:
+    build:
+      context: ./requirements/debian/
+    image: debian:XD
+    container_name: mysql_client
+    env_file:
+      - .env
+    networks:
+      - inception-net
+
+networks:
+  inception-net:
+    driver: bridge
+
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/hbouabda/data/db/
+  
+  wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/hbouabda/data/wordpress/
