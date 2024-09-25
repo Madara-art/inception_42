@@ -1,6 +1,7 @@
 FROM debian:bullseye
 RUN apt-get update && \
     apt-get install -y --no-install-recommends nginx openssl && \
+    apt-get install -y gettext-base && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
@@ -9,7 +10,7 @@ RUN apt-get update && \
 
 COPY tools/al_script.sh /bin/
 
-COPY conf/nginx.conf /etc/nginx/nginx.conf
+COPY conf/nginx.conf /etc/nginx/nginx.conf.template
 
 RUN chmod +x /bin/al_script.sh
 

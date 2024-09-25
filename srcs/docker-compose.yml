@@ -30,7 +30,7 @@ services:
     volumes:
       - wordpress:/var/www/wordpress/
     ports:
-      - 443:50
+      - 443:443
     restart: always
     networks:
       - inception-net

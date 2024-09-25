@@ -29,8 +29,11 @@ services:
       - .env
     volumes:
       - wordpress:/var/www/wordpress/
+      # - tinyfilemanager:/tinyfilemanager
     ports:
-      - 443:50
+      - 443:443
+      - 80:80
+      - 88:88
     restart: always
     networks:
       - inception-net
@@ -58,6 +61,7 @@ services:
     container_name: mysql_client
     env_file:
       - .env
+    restart: always
     networks:
       - inception-net
   
@@ -68,6 +72,7 @@ services:
     container_name: adminer
     env_file:
       - .env
+    restart: always
     networks:
       - inception-net
       
@@ -78,6 +83,7 @@ services:
     container_name: redis
     env_file:
       - .env
+    restart: always
     networks:
       - inception-net
 
@@ -93,9 +99,37 @@ services:
       - "30000-30100:30000-30100"
     volumes:
       - wordpress:/var/www/wordpress/
+    restart: always
     networks:
       - inception-net
 
+  tinyfilemanager:
+    build:
+      context: ./tinyfilemanager/
+    image: tinyfilemanager:1337
+    container_name: tinyfilemanager
+    env_file:
+      - .env
+    # volumes:
+    #   - tinyfilemanager:/tinyfilemanager
+    ports:
+      - 1999:1337
+    restart: always
+    networks:
+      - inception-net
+    depends_on:
+      - nginx
+
+  cv:
+    build:
+      context: ./cv/
+    image: cv:1337
+    container_name: cv
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - inception-net
 networks:
   inception-net:
     driver: bridge
@@ -114,3 +148,10 @@ volumes:
       type: none
       o: bind
       device: /home/hbouabda/data/wordpress/
+
+  tinyfilemanager:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/hbouabda/data/tinyfilemanager/
