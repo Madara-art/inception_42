@@ -18,4 +18,6 @@ COPY ./tools/al_script.sh /bin/
 
 RUN	chmod +x /bin/al_script.sh
 
-CMD ["al_script.sh"]
+ENTRYPOINT ["al_script.sh"]
+
+CMD ["php-fpm7.4", "--nodaemonize"]

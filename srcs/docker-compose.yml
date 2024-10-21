@@ -31,6 +31,9 @@ services:
       - wordpress:/var/www/wordpress/
     ports:
       - 443:443
+    depends_on:
+      wordpress:
+        condition: service_healthy
     restart: always
     networks:
       - inception-net
@@ -47,17 +50,12 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "service", "php7.4-fpm", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 1000000
     restart: always
-    networks:
-      - inception-net
-
-  debian:
-    build:
-      context: ./requirements/debian/
-    image: debian:XD
-    container_name: mysql_client
-    env_file:
-      - .env
     networks:
       - inception-net
 

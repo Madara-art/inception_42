@@ -1,4 +1,4 @@
-FROM debian:11
+FROM debian:bullseye
 
 RUN apt-get update && apt-get install -y \
     python3 \
@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /var/www/cv
 
-COPY ./tools/index.html .
+COPY ./tools/* .
 
 EXPOSE 8000
 

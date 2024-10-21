@@ -4,13 +4,15 @@
 # do
 #   sleep 5
 # done
+
 # mkdir /tinyfilemanager
+
+mkdir -p /etc/nginx/ssl
 
 envsubst '${SSL_PRIVATE_KEY_PATH} ${SSL_CERT_PATH}' \
         < /etc/nginx/nginx.conf.template \
         > /etc/nginx/nginx.conf
 
-mkdir -p /etc/nginx/ssl
 chown -R www-data:www-data /var/www/wordpress/ 
 # chown -R www-data:www-data /tinyfilemanager
 # chmod -R 775 /tinyfilemanager

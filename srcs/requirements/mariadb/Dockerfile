@@ -1,4 +1,4 @@
-FROM debian:11
+FROM debian:bullseye
 
 RUN apt-get update && \
     apt-get install --no-install-recommends mariadb-server -y && \
@@ -7,7 +7,7 @@ RUN apt-get update && \
 
 EXPOSE 3306
 
-COPY ./conf/60-server.cnf /etc/mysql/mariadb.conf.d/
+COPY ./conf/50-server.cnf /etc/mysql/mariadb.conf.d/
 
 COPY ./tools/al_script.sh /bin/
 

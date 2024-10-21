@@ -3,7 +3,7 @@
 # do
 #   sleep 30
 # done
-chown -R mysql:mysql /var/lib/mysql
+# chown -R mysql:mysql /var/lib/mysql
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     mysql_install_db --basedir=/usr --datadir=/var/lib/mysql --user=mysql #?
 fi

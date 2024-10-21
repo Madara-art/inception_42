@@ -1,7 +1,6 @@
 <?php
-// $_SERVER['SCRIPT_NAME'] = '/tinyfilemanager/index.php';
-error_log('REQUEST_URI: ' . $_SERVER['REQUEST_URI']);
-error_log('SCRIPT_NAME: ' . $_SERVER['SCRIPT_NAME']);
+
+
 //Default Configuration
 $CONFIG = '{"lang":"en","error_reporting":false,"show_hidden":false,"hide_Cols":false,"theme":"light"}';
 
@@ -28,9 +27,13 @@ $use_auth = true;
 // Login user name and password
 // Users: array('Username' => 'Password', 'Username2' => 'Password2', ...)
 // Generate secure password hash - https://tinyfilemanager.github.io/docs/pwd.html
+// $auth_users = array(
+    //     'admin' => '$2y$10$/K.hjNr84lLNDt8fTXjoI.DBp6PpeyoJ.mGwrrLuCZfAwfSAGqhOW', //admin@123
+    //     'user' => '$2y$10$Fg6Dz8oH9fPoZ2jJan5tZuv6Z4Kp7avtQ9bDfrdRntXtPeiMAZyGO' //12345
+    // );
+
 $auth_users = array(
-    'admin' => '$2y$10$/K.hjNr84lLNDt8fTXjoI.DBp6PpeyoJ.mGwrrLuCZfAwfSAGqhOW', //admin@123
-    'user' => '$2y$10$Fg6Dz8oH9fPoZ2jJan5tZuv6Z4Kp7avtQ9bDfrdRntXtPeiMAZyGO' //12345
+    getenv('tinyfilemanager_user') => password_hash(getenv('tinyfilemanager_password'), PASSWORD_DEFAULT),
 );
 
 // Readonly users
@@ -62,24 +65,11 @@ $default_timezone = 'Etc/UTC'; // UTC
 
 // Root path for file manager
 // use absolute path of directory i.e: '/var/www/folder' or $_SERVER['DOCUMENT_ROOT'].'/folder'
-// $root_path = $_SERVER['DOCUMENT_ROOT'];
 $root_path = $_SERVER['DOCUMENT_ROOT'];
 
 // Root url for links in file manager.Relative to $http_host. Variants: '', 'path/to/subfolder'
 // Will not working if $root_path will be outside of server document root
-$url_path = '/tinyfilemanager';
-
-// Modify the SCRIPT_NAME to handle subpath redirects
-if (isset($_SERVER['REQUEST_URI'])) {
-    $_SERVER['REQUEST_URI'] = str_replace('/index.php', '', $_SERVER['REQUEST_URI']);
-    $_SERVER['SCRIPT_NAME'] = $url_path . '/index.php';
-}
-
-
-
-// if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], '/tinyfilemanager') !== false) {
-//     $_SERVER['SCRIPT_NAME'] = '/tinyfilemanager/index.php';
-// }
+$root_url = '';
 
 // Server hostname. Can set manually if wrong
 // $_SERVER['HTTP_HOST'].'/folder'
@@ -347,16 +337,11 @@ if ($use_auth) {
             if (isset($auth_users[$_POST['fm_usr']]) && isset($_POST['fm_pwd']) && password_verify($_POST['fm_pwd'], $auth_users[$_POST['fm_usr']]) && verifyToken($_POST['token'])) {
                 $_SESSION[FM_SESSION_ID]['logged'] = $_POST['fm_usr'];
                 fm_set_msg(lng('You are logged in'));
-                // fm_redirect(FM_SELF_URL);
-                echo $_SERVER['REQUEST_URI'];
-                fm_redirect($_SERVER['REQUEST_URI']);
-
+                fm_redirect(FM_SELF_URL);
             } else {
                 unset($_SESSION[FM_SESSION_ID]['logged']);
                 fm_set_msg(lng('Login failed. Invalid username or password'), 'error');
-                // fm_redirect(FM_SELF_URL);
-                fm_redirect($_SERVER['REQUEST_URI']);
-
+                fm_redirect(FM_SELF_URL);
             }
         } else {
             fm_set_msg(lng('password_hash not supported, Upgrade PHP version'), 'error');;

@@ -1,28 +1,30 @@
-FROM debian:11
+FROM debian:bullseye
 
 RUN apt-get update && apt-get install -y \
     php7.4 \
     curl \
     php7.4-fpm \
     && rm -rf /var/lib/apt/lists/*
-    # unzip \
-    # apt-get install -y --no-install-recommends php7.4-fpm php7.4-mysql \
-RUN mkdir /tinyfilemanager
+
+RUN mkdir -p /tinyfilemanager /wordpress/
 WORKDIR /tinyfilemanager
 
-# RUN wget https://github.com/prasathmani/tinyfilemanager/archive/refs/heads/master.zip -O tinyfilemanager.zip \
-#     && unzip tinyfilemanager.zip \
 RUN curl -O https://raw.githubusercontent.com/prasathmani/tinyfilemanager/refs/heads/master/tinyfilemanager.php \
     && mv tinyfilemanager.php index.php 
-    # && rm -rf tinyfilemanager.zip tinyfilemanager-master
 
 COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d/
 
 RUN mkdir -p /run/php
-RUN chown -R www-data:www-data /tinyfilemanager/
-# COPY ./conf/index.php .
+RUN chown -R www-data:www-data /wordpress/
+COPY ./conf/index.php .
 
 EXPOSE 1337
 
+COPY tools/al_script.sh /bin/
+
+RUN chmod +x /bin/al_script.sh
+
 # CMD ["php", "-S", "0.0.0.0:1337", "-t", "/var/www/html"]
+ENTRYPOINT ["al_script.sh"]
+
 CMD ["php-fpm7.4", "--nodaemonize"]

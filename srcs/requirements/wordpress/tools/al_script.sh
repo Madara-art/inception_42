@@ -5,8 +5,8 @@
 #   sleep 5
 # done
 # ln -sf /dev/stdout /var/log/php7.x-fpm-access.log
+
 mkdir -p /run/php
-# chown www-data:www-data /run/php
 
 if [ -f "/var/www/wordpress/wp-config.php" ]; then
     echo wordpress already installed.
@@ -21,4 +21,4 @@ fi
 # --path=/var/www/wordpress
 
 
-php-fpm7.4 --nodaemonize
+exec "$@"

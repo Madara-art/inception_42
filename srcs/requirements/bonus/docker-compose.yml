@@ -29,11 +29,12 @@ services:
       - .env
     volumes:
       - wordpress:/var/www/wordpress/
-      # - tinyfilemanager:/tinyfilemanager
     ports:
       - 443:443
-      - 80:80
-      - 88:88
+      - 8080:8080
+    depends_on:
+      wordpress:
+        condition: service_healthy
     restart: always
     networks:
       - inception-net
@@ -50,17 +51,11 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-    restart: always
-    networks:
-      - inception-net
-
-  debian:
-    build:
-      context: ./debian/
-    image: debian:XD
-    container_name: mysql_client
-    env_file:
-      - .env
+    healthcheck:
+      test: ["CMD", "service", "php7.4-fpm", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 1000000
     restart: always
     networks:
       - inception-net
@@ -110,15 +105,11 @@ services:
     container_name: tinyfilemanager
     env_file:
       - .env
-    # volumes:
-    #   - tinyfilemanager:/tinyfilemanager
-    ports:
-      - 1999:1337
+    volumes:
+      - wordpress:/wordpress/
     restart: always
     networks:
       - inception-net
-    depends_on:
-      - nginx
 
   cv:
     build:
@@ -148,10 +139,3 @@ volumes:
       type: none
       o: bind
       device: /home/hbouabda/data/wordpress/
-
-  tinyfilemanager:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /home/hbouabda/data/tinyfilemanager/
